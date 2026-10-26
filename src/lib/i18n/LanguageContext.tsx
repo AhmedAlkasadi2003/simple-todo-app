@@ -6,12 +6,44 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from "react";
 import { Direction, Language, TranslationDictionary } from "./types";
 import { translations } from "./translations";
 
 const STORAGE_LANG_KEY = "simple_todo_lang";
+
+const listeners = new Set<() => void>();
+
+function emitChange() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getSnapshot(): Language {
+  if (typeof window === "undefined") return "en";
+  try {
+    const saved = localStorage.getItem(STORAGE_LANG_KEY);
+    if (saved === "ar" || saved === "en") return saved;
+  } catch {
+    // Storage restricted or disabled
+  }
+  return "en";
+}
+
+function getServerSnapshot(): Language {
+  return "en";
+}
 
 export interface LanguageContextValue {
   language: Language;
@@ -26,34 +58,24 @@ export interface LanguageContextValue {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  const language = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
-  // Load language from localStorage once mounted on client
+  // Sync document dir and lang attributes when language changes
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_LANG_KEY) as Language | null;
-      if (saved === "ar" || saved === "en") {
-        setLanguageState(saved);
-      }
-    } catch {
-      // localStorage unavailable or restricted
-    }
-  }, []);
-
-  // Update HTML tag dir and lang attributes
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = language;
-      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-    }
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [language]);
 
   const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
     try {
       localStorage.setItem(STORAGE_LANG_KEY, lang);
+      emitChange();
     } catch {
-      // Ignore storage errors
+      // Storage restricted
     }
   }, []);
 
@@ -113,7 +135,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage(): LanguageContextValue {
   const context = useContext(LanguageContext);
   if (!context) {
-    // Graceful fallback for tests or components rendered outside provider
     const defaultLang: Language = "en";
     return {
       language: defaultLang,

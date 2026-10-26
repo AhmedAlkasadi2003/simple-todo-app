@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Task } from "@/features/tasks/types";
-import { formatDate } from "@/features/tasks/utils";
 import { useTask } from "@/features/tasks/hooks";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
@@ -19,6 +18,7 @@ import {
 import { TaskFormModal } from "../forms/TaskFormModal";
 import { DeleteConfirmDialog } from "../forms/DeleteConfirmDialog";
 import { taskService } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface TaskDetailsProps {
   initialTask?: Task;
@@ -27,6 +27,7 @@ export interface TaskDetailsProps {
 
 export function TaskDetails({ taskId }: TaskDetailsProps) {
   const router = useRouter();
+  const { t, formatDate, isRTL } = useLanguage();
   const { task, isLoading, isSubmitting, error, reload, update, toggleStatus } =
     useTask(taskId);
 
@@ -82,13 +83,16 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
           href="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 mb-6 transition-colors"
         >
-          <ArrowLeftIcon className="w-4 h-4" />
-          Back to all tasks
+          <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
+          {t.details.backToList}
         </Link>
         <Alert
           type="error"
-          title="Task not found or failed to load"
-          message={error?.message || `Could not find task with ID "${taskId}".`}
+          title={t.details.notFoundTitle}
+          message={
+            error?.message ||
+            t.details.notFoundDesc
+          }
           onRetry={reload}
         />
       </div>
@@ -105,8 +109,8 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
           href="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:underline"
         >
-          <ArrowLeftIcon className="w-4 h-4" />
-          Back to task list
+          <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
+          {t.details.backToList}
         </Link>
       </div>
 
@@ -128,7 +132,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             <div className="flex items-center gap-2.5 mb-2">
               <Badge status={task.status} />
               <span className="font-mono text-xs text-zinc-400">
-                ID: {task.id}
+                {t.card.idLabel} {task.id}
               </span>
             </div>
             <h1
@@ -150,14 +154,14 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             isLoading={isSubmitting}
             leftIcon={<CheckIcon className="w-4 h-4" />}
           >
-            {isCompleted ? "Mark Pending" : "Mark Complete"}
+            {isCompleted ? t.details.markPending : t.details.markComplete}
           </Button>
         </div>
 
         {/* Description */}
         <div className="py-6 border-b border-zinc-100 dark:border-zinc-800">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
-            Description
+            {t.details.descriptionHeading}
           </h2>
           {task.description ? (
             <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
@@ -165,7 +169,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             </p>
           ) : (
             <p className="text-sm italic text-zinc-400">
-              No description provided for this task.
+              {t.details.noDescription}
             </p>
           )}
         </div>
@@ -176,7 +180,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             <CalendarIcon className="w-4 h-4 text-zinc-400" />
             <div>
               <span className="block font-medium text-zinc-700 dark:text-zinc-300">
-                Created At
+                {t.details.createdAtHeading}
               </span>
               <span>{formatDate(task.createdAt)}</span>
             </div>
@@ -186,7 +190,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             <CalendarIcon className="w-4 h-4 text-zinc-400" />
             <div>
               <span className="block font-medium text-zinc-700 dark:text-zinc-300">
-                Last Updated
+                {t.details.lastUpdatedHeading}
               </span>
               <span>{formatDate(task.updatedAt)}</span>
             </div>
@@ -202,7 +206,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             onClick={() => setIsEditModalOpen(true)}
             disabled={isSubmitting}
           >
-            Edit Task
+            {t.details.editAction}
           </Button>
 
           <Button
@@ -212,7 +216,7 @@ export function TaskDetails({ taskId }: TaskDetailsProps) {
             onClick={() => setIsDeleteDialogOpen(true)}
             disabled={isSubmitting}
           >
-            Delete Task
+            {t.details.deleteAction}
           </Button>
         </div>
       </article>

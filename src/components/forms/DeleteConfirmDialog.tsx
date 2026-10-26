@@ -5,6 +5,7 @@ import { Task } from "@/features/tasks/types";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { TrashIcon } from "../ui/Icons";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface DeleteConfirmDialogProps {
   isOpen: boolean;
@@ -21,13 +22,14 @@ export function DeleteConfirmDialog({
   onConfirm,
   isSubmitting = false,
 }: DeleteConfirmDialogProps) {
+  const { t } = useLanguage();
   if (!task) return null;
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Delete Task"
+      title={t.deleteDialog.title}
       maxWidth="sm"
     >
       <div className="flex flex-col gap-4">
@@ -37,13 +39,13 @@ export function DeleteConfirmDialog({
           </div>
           <div>
             <p className="text-sm text-zinc-600 dark:text-zinc-300">
-              Are you sure you want to permanently delete this task?
+              {t.deleteDialog.confirmQuestion}
             </p>
             <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1 line-clamp-2">
               &ldquo;{task.title}&rdquo;
             </p>
             <p className="text-xs text-zinc-400 mt-2">
-              This action cannot be undone. In a live backend, this triggers an HTTP DELETE request.
+              {t.deleteDialog.warningDesc}
             </p>
           </div>
         </div>
@@ -55,7 +57,7 @@ export function DeleteConfirmDialog({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            Cancel
+            {t.deleteDialog.cancel}
           </Button>
           <Button
             type="button"
@@ -63,7 +65,7 @@ export function DeleteConfirmDialog({
             isLoading={isSubmitting}
             onClick={onConfirm}
           >
-            Delete Task
+            {t.deleteDialog.deleteButton}
           </Button>
         </div>
       </div>

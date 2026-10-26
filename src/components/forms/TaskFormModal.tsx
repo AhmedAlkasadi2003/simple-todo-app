@@ -2,14 +2,12 @@
 
 import React, { useState } from "react";
 import { CreateTaskInput, Task, UpdateTaskInput } from "@/features/tasks/types";
-import {
-  TASK_LIMITS,
-  validateTaskInput,
-} from "@/features/tasks/validation";
+import { TASK_LIMITS } from "@/features/tasks/validation";
 import { Modal } from "../ui/Modal";
 import { Input } from "../ui/Input";
 import { Textarea } from "../ui/Textarea";
 import { Button } from "../ui/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface TaskFormModalProps {
   isOpen: boolean;
@@ -32,6 +30,7 @@ function TaskFormFields({
   onSubmit,
   isSubmitting,
 }: FormFieldsProps) {
+  const { t } = useLanguage();
   const isEditing = Boolean(taskToEdit);
 
   const [title, setTitle] = useState(taskToEdit?.title ?? "");
@@ -44,36 +43,55 @@ function TaskFormFields({
     description?: boolean;
   }>({});
 
+  const validate = (tVal: string, dVal: string) => {
+    const errs: { title?: string; description?: string } = {};
+    const trimmedTitle = tVal.trim();
+
+    if (!trimmedTitle) {
+      errs.title = t.form.validationTitleRequired;
+    } else if (trimmedTitle.length < TASK_LIMITS.TITLE_MIN_LENGTH) {
+      errs.title = t.form.validationTitleMin;
+    } else if (trimmedTitle.length > TASK_LIMITS.TITLE_MAX_LENGTH) {
+      errs.title = t.form.validationTitleMax;
+    }
+
+    if (dVal && dVal.trim().length > TASK_LIMITS.DESCRIPTION_MAX_LENGTH) {
+      errs.description = t.form.validationDescMax;
+    }
+
+    return errs;
+  };
+
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (touched.title) {
-      const res = validateTaskInput({ title: val, description }, isEditing);
-      setErrors((prev) => ({ ...prev, title: res.errors.title }));
+      const errs = validate(val, description);
+      setErrors((prev) => ({ ...prev, title: errs.title }));
     }
   };
 
   const handleDescriptionChange = (val: string) => {
     setDescription(val);
     if (touched.description) {
-      const res = validateTaskInput({ title, description: val }, isEditing);
-      setErrors((prev) => ({ ...prev, description: res.errors.description }));
+      const errs = validate(title, val);
+      setErrors((prev) => ({ ...prev, description: errs.description }));
     }
   };
 
   const handleBlur = (field: "title" | "description") => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    const res = validateTaskInput({ title, description }, isEditing);
-    setErrors(res.errors);
+    const errs = validate(title, description);
+    setErrors(errs);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setTouched({ title: true, description: true });
-    const validation = validateTaskInput({ title, description }, isEditing);
+    const errs = validate(title, description);
 
-    if (!validation.isValid) {
-      setErrors(validation.errors);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
       return;
     }
 
@@ -92,28 +110,28 @@ function TaskFormFields({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       {/* Title Input */}
       <Input
-        label="Title"
+        label={t.form.titleLabel}
         required
-        placeholder="e.g. Implement authentication endpoint"
+        placeholder={t.form.titlePlaceholder}
         value={title}
         maxLength={TASK_LIMITS.TITLE_MAX_LENGTH}
         onChange={(e) => handleTitleChange(e.target.value)}
         onBlur={() => handleBlur("title")}
         error={touched.title ? errors.title : undefined}
-        hint={`1 to ${TASK_LIMITS.TITLE_MAX_LENGTH} characters`}
+        hint={t.form.titleHint}
         autoFocus
       />
 
       {/* Description Textarea */}
       <Textarea
-        label="Description (Optional)"
-        placeholder="Add details, requirements, or acceptance criteria..."
+        label={t.form.descriptionLabel}
+        placeholder={t.form.descriptionPlaceholder}
         value={description}
         maxLength={TASK_LIMITS.DESCRIPTION_MAX_LENGTH}
         onChange={(e) => handleDescriptionChange(e.target.value)}
         onBlur={() => handleBlur("description")}
         error={touched.description ? errors.description : undefined}
-        hint="Brief context for this task"
+        hint={t.form.descriptionHint}
       />
 
       {/* Actions */}
@@ -124,7 +142,7 @@ function TaskFormFields({
           onClick={onClose}
           disabled={isSubmitting}
         >
-          Cancel
+          {t.form.cancel}
         </Button>
         <Button
           type="submit"
@@ -132,7 +150,7 @@ function TaskFormFields({
           isLoading={isSubmitting}
           disabled={!title.trim()}
         >
-          {isEditing ? "Save Changes" : "Create Task"}
+          {isEditing ? t.form.saveSubmit : t.form.createSubmit}
         </Button>
       </div>
     </form>
@@ -146,18 +164,15 @@ export function TaskFormModal({
   onSubmit,
   isSubmitting = false,
 }: TaskFormModalProps) {
+  const { t } = useLanguage();
   const isEditing = Boolean(taskToEdit);
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "Edit Task" : "Create New Task"}
-      description={
-        isEditing
-          ? "Update the details for this task."
-          : "Add a new task to your task management dashboard."
-      }
+      title={isEditing ? t.form.editTitle : t.form.createTitle}
+      description={isEditing ? t.form.editSubtitle : t.form.createSubtitle}
     >
       {isOpen && (
         <TaskFormFields

@@ -9,6 +9,7 @@ Designed as a production-grade frontend that is immediately usable in local **Mo
 ## 🌟 Key Features
 
 - **Full Task Lifecycle**: Create, list, view details (`/tasks/[id]`), edit, toggle completion, and delete with confirmation.
+- **Bilingual & RTL Ready**: Full English (`EN`) and Arabic (`AR`) internationalization with dynamic Right-to-Left (RTL) support, locale-aware date formatting, and instant language switching.
 - **Search, Filter & Sort**: Fast client-side searching across titles and descriptions, status filtering (`All`, `Pending`, `Completed`), and sorting by date or title.
 - **State Management & UX**: Animated loading skeletons, empty states, button spinners, error banners with retry action, and success notifications.
 - **Dual Data Modes**:

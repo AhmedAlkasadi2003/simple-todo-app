@@ -11,8 +11,10 @@ import { TaskList } from "./TaskList";
 import { Alert } from "../ui/Alert";
 import { TaskFormModal } from "../forms/TaskFormModal";
 import { DeleteConfirmDialog } from "../forms/DeleteConfirmDialog";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function TaskDashboard() {
+  const { t } = useLanguage();
   const {
     tasks,
     filteredTasks,
@@ -87,10 +89,10 @@ export function TaskDashboard() {
         {/* Intro Subtitle & Overview */}
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Task Management Dashboard
+            {t.app.dashboardTitle}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Create, track, filter, and organize your tasks. Every action here maps to a REST API endpoint.
+            {t.app.dashboardSubtitle}
           </p>
         </div>
 

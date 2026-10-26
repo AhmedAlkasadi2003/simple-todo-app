@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import { Task } from "@/features/tasks/types";
 import { TaskCard } from "./TaskCard";
 import { Button } from "../ui/Button";
 import { PlusIcon, SearchIcon } from "../ui/Icons";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface TaskListProps {
   tasks: Task[];
@@ -29,10 +32,16 @@ export function TaskList({
   onCreateNew,
   onClearFilters,
 }: TaskListProps) {
+  const { t } = useLanguage();
+
   // Loading Skeleton State
   if (isLoading) {
     return (
-      <div className="w-full flex flex-col gap-3" aria-busy="true" aria-label="Loading tasks">
+      <div
+        className="w-full flex flex-col gap-3"
+        aria-busy="true"
+        aria-label={t.list.loadingAria}
+      >
         {[1, 2, 3].map((i) => (
           <div
             key={i}
@@ -59,17 +68,17 @@ export function TaskList({
           <PlusIcon className="w-6 h-6" />
         </div>
         <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          No tasks yet
+          {t.list.noTasksYet}
         </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mt-1 mb-5">
-          Get started by adding your first task. It will be stored in your active data source.
+          {t.list.noTasksYetDesc}
         </p>
         <Button
           variant="primary"
           leftIcon={<PlusIcon className="w-4 h-4" />}
           onClick={onCreateNew}
         >
-          Create First Task
+          {t.list.createFirstTask}
         </Button>
       </div>
     );
@@ -83,15 +92,15 @@ export function TaskList({
           <SearchIcon className="w-6 h-6" />
         </div>
         <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          No matching tasks found
+          {t.list.noMatchingTasks}
         </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mt-1 mb-5">
           {searchQuery
-            ? `No tasks matched your search query "${searchQuery}".`
-            : "No tasks matched the selected status filter."}
+            ? t.list.noMatchingSearch.replace("{query}", searchQuery)
+            : t.list.noMatchingStatus}
         </p>
         <Button variant="outline" size="sm" onClick={onClearFilters}>
-          Reset Search & Filters
+          {t.list.resetFilters}
         </Button>
       </div>
     );
@@ -99,7 +108,11 @@ export function TaskList({
 
   // Active Task List
   return (
-    <div className="w-full flex flex-col gap-3" role="feed" aria-label="Task list">
+    <div
+      className="w-full flex flex-col gap-3"
+      role="feed"
+      aria-label={t.list.feedAria}
+    >
       {tasks.map((task) => (
         <TaskCard
           key={task.id}

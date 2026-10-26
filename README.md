@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simple Tasks — Todo App
 
-## Getting Started
+A modern, responsive, and robust task management application built with **Next.js App Router**, **TypeScript**, and **Tailwind CSS**.
 
-First, run the development server:
+Designed as a production-grade frontend that is immediately usable in local **Mock Mode** and 100% prepared to connect to a custom **REST API backend** built by an instructor.
 
+---
+
+## 🌟 Key Features
+
+- **Full Task Lifecycle**: Create, list, view details (`/tasks/[id]`), edit, toggle completion, and delete with confirmation.
+- **Search, Filter & Sort**: Fast client-side searching across titles and descriptions, status filtering (`All`, `Pending`, `Completed`), and sorting by date or title.
+- **State Management & UX**: Animated loading skeletons, empty states, button spinners, error banners with retry action, and success notifications.
+- **Dual Data Modes**:
+  - **Mock Mode**: Fully functional standalone frontend using browser `localStorage` and simulated async delays.
+  - **Live API Mode**: Connects directly to any backend REST API adhering to the documented contract.
+- **Accessible Design**: Semantic HTML, visible keyboard focus rings, screen-reader labels, and custom SVG icons (no heavy emoji-only controls).
+- **Rigorously Tested**: 55 automated unit, integration, and component tests using Vitest and React Testing Library.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment
+```bash
+cp .env.example .env.local
+```
+By default, `NEXT_PUBLIC_DATA_MODE=mock` is active.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Run Test Suite
+```bash
+npm run test
+```
 
-## Learn More
+### 5. Check Lint & Production Build
+```bash
+npm run lint
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔌 Switching to a Live Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+When your backend server is ready:
+1. Open `.env.local`
+2. Set `NEXT_PUBLIC_DATA_MODE=api`
+3. Set `NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1` (adjust to your backend port/path)
+4. Restart the development server: `npm run dev`
 
-## Deploy on Vercel
+The UI header will update from **Mock Mode** to **Live API** and all requests will hit your backend endpoints.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📚 Educational Documentation
+
+Comprehensive architectural and backend guides are available in the [`docs/`](./docs) folder:
+
+- 📖 [**Project Overview**](./docs/PROJECT_OVERVIEW.md) — System features, scope boundaries, and core decisions.
+- 🏗️ [**Frontend Architecture**](./docs/FRONTEND_ARCHITECTURE.md) — App Router, Server vs. Client components, data flow, and debugging tips.
+- 📡 [**REST API Contract**](./docs/API_CONTRACT.md) — Endpoints, HTTP methods, headers, status codes, and request/response examples.
+- 🎓 [**Backend Learning Guide**](./docs/BACKEND_LEARNING_GUIDE.md) — 10-lesson pedagogical roadmap for human instructors teaching backend concepts to frontend developers.
+- 🧪 [**Testing Guide**](./docs/TESTING_GUIDE.md) — Test suite breakdown, mocking strategies, and quality assurance instructions.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **UI Library**: [React 19](https://react.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) (Strict mode)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Testing**: [Vitest](https://vitest.dev/) & [@testing-library/react](https://testing-library.com/)
+- **Data Fetching**: Native browser `fetch` with AbortController and custom error normalization
+
+---
+
+## 📄 License
+MIT
